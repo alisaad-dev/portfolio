@@ -6,19 +6,12 @@ const Footer = () => {
 
   return (
     <footer className="footer">
-      <div className="container">
-        <div className="footer-content">
-          <p className="footer-text">
-            © {currentYear} Ali Saad. All rights reserved.
-          </p>
-          <p className="footer-copyright">
-            Node.js • Express • MongoDB • React
-          </p>
-        </div>
+      <div className="container footer-content">
+        <p className="footer-text">© {currentYear} Ali Saad</p>
+        <p className="footer-meta">Node.js · Express · MongoDB · React · AWS</p>
       </div>
     </footer>
   );
 };
 
 export default Footer;
-

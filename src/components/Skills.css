@@ -1,36 +1,35 @@
 .skills-bar {
-  padding: 40px 0;
-  background-color: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
+  padding: 1.75rem 0;
+  border-block: 1px solid var(--line);
+  background: var(--surface);
 }
 
 .skills-list {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 48px;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem 1.75rem;
+  list-style: none;
 }
 
 .skill-item {
-  font-size: 16px;
-  color: var(--text-secondary);
-  font-weight: 400;
-  transition: color 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--steel);
+  letter-spacing: 0.01em;
+  transition: color 0.25s var(--ease);
 }
 
 .skill-item:hover {
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .skills-list {
-    gap: 32px;
+    gap: 0.5rem 1.15rem;
   }
 
   .skill-item {
-    font-size: 14px;
+    font-size: 0.8125rem;
   }
 }
-

@@ -1,58 +1,107 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../context/ThemeContext';
 import './Header.css';
 
+const THEME_OPTIONS = [
+  {
+    id: 'light',
+    label: 'Light',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.75" />
+        <path
+          d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'dark',
+    label: 'Dark',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M20 13.5A8.5 8.5 0 1 1 10.5 4 7 7 0 0 0 20 13.5Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'system',
+    label: 'System',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect
+          x="3.5"
+          y="4.5"
+          width="17"
+          height="12"
+          rx="1.5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+        />
+        <path
+          d="M8 20h8M12 16.5V20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+];
+
 const Header = () => {
+  const { preference, setPreference } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [isScrollingProgrammatically, setIsScrollingProgrammatically] = useState(false);
 
   useEffect(() => {
     let scrollTimeout;
-    
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
 
-      // Skip active section detection if we're programmatically scrolling
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 40);
+
       if (isScrollingProgrammatically) {
         return;
       }
 
-      // Clear any pending timeout
       clearTimeout(scrollTimeout);
 
-      // Debounce scroll detection to avoid multiple updates during smooth scroll
       scrollTimeout = setTimeout(() => {
         const sections = ['hero', 'about', 'projects', 'contact'];
-        const scrollPosition = window.scrollY;
         const header = document.querySelector('.header');
-        const headerHeight = header ? header.offsetHeight : 80;
-        const triggerPoint = scrollPosition + headerHeight + 200; // Point where section becomes active
+        const headerHeight = header ? header.offsetHeight : 72;
+        const triggerPoint = window.scrollY + headerHeight + 160;
 
         let currentSection = 'hero';
 
-        // Find the section that the trigger point is currently in
-        // Check from bottom to top to get the most recent section
         for (let i = sections.length - 1; i >= 0; i--) {
           const section = document.getElementById(sections[i]);
-          if (section) {
-            const sectionTop = section.offsetTop;
-            
-            // If trigger point has passed this section's top, this is the active section
-            if (triggerPoint >= sectionTop) {
-              currentSection = sections[i];
-              break;
-            }
+          if (section && triggerPoint >= section.offsetTop) {
+            currentSection = sections[i];
+            break;
           }
         }
 
-        // Update active section - this ensures only one section is active
         setActiveSection(currentSection);
-      }, 150);
+      }, 120);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check on mount
-    
+    handleScroll();
+
     return () => {
       clearTimeout(scrollTimeout);
       window.removeEventListener('scroll', handleScroll);
@@ -60,28 +109,24 @@ const Header = () => {
   }, [isScrollingProgrammatically]);
 
   const scrollToSection = (sectionId) => {
-    // Immediately update active section and disable scroll detection temporarily
     setActiveSection(sectionId);
     setIsScrollingProgrammatically(true);
-    
+
     const element = document.getElementById(sectionId);
     if (element) {
       const header = document.querySelector('.header');
-      const headerHeight = header ? header.offsetHeight : 80;
-      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = Math.max(0, elementPosition - headerHeight);
+      const headerHeight = header ? header.offsetHeight : 72;
+      const offsetPosition = Math.max(
+        0,
+        element.getBoundingClientRect().top + window.pageYOffset - headerHeight
+      );
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
 
-      // Re-enable scroll detection after scroll animation completes
       setTimeout(() => {
         setIsScrollingProgrammatically(false);
-        // Force update active section after scroll
         setActiveSection(sectionId);
-      }, 800); // Smooth scroll typically takes ~500-700ms
+      }, 700);
     } else {
       setIsScrollingProgrammatically(false);
     }
@@ -90,48 +135,58 @@ const Header = () => {
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="container">
-        <nav className="nav">
-          <div className="logo" onClick={() => scrollToSection('hero')}>
+        <nav className="nav" aria-label="Primary">
+          <button
+            type="button"
+            className="logo"
+            onClick={() => scrollToSection('hero')}
+          >
             Ali Saad
+          </button>
+          <div className="nav-end">
+            <ul className="nav-links">
+              {[
+                { id: 'hero', label: 'Home' },
+                { id: 'about', label: 'About' },
+                { id: 'projects', label: 'Projects' },
+                { id: 'contact', label: 'Contact' },
+              ].map((item) => (
+                <li key={item.id}>
+                  <a
+                    href={`#${item.id}`}
+                    className={activeSection === item.id ? 'active' : ''}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection(item.id);
+                    }}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div
+              className="theme-toggle"
+              role="group"
+              aria-label="Color theme"
+            >
+              {THEME_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`theme-toggle-btn${
+                    preference === option.id ? ' active' : ''
+                  }`}
+                  aria-label={`${option.label} theme`}
+                  aria-pressed={preference === option.id}
+                  title={option.label}
+                  onClick={() => setPreference(option.id)}
+                >
+                  {option.icon}
+                </button>
+              ))}
+            </div>
           </div>
-          <ul className="nav-links">
-            <li>
-              <a 
-                href="#hero" 
-                className={activeSection === 'hero' ? 'active' : ''}
-                onClick={(e) => { e.preventDefault(); scrollToSection('hero'); }}
-              >
-                Home
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#about" 
-                className={activeSection === 'about' ? 'active' : ''}
-                onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}
-              >
-                About
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#projects" 
-                className={activeSection === 'projects' ? 'active' : ''}
-                onClick={(e) => { e.preventDefault(); scrollToSection('projects'); }}
-              >
-                Projects
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#contact" 
-                className={activeSection === 'contact' ? 'active' : ''}
-                onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }}
-              >
-                Contact
-              </a>
-            </li>
-          </ul>
         </nav>
       </div>
     </header>
@@ -139,4 +194,3 @@ const Header = () => {
 };
 
 export default Header;
-

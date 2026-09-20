@@ -3,3 +3,8 @@
 /build
 
 DEPLOY.md
+
+# local agent skills (not part of the site)
+.agents/
+.cursor/skills/
+skills-lock.json

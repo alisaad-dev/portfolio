@@ -5,26 +5,30 @@ const Skills = () => {
   const technologies = [
     'HTML5',
     'CSS',
-    'Javascript',
+    'JavaScript',
     'Node.js',
     'React',
+    'Express',
+    'MongoDB',
+    'Docker',
+    'AWS',
+    'CI/CD',
     'Git',
-    'Github',
-    'DevOps'
   ];
 
   return (
-    <section className="skills-bar">
+    <section className="skills-bar" aria-label="Technologies">
       <div className="container">
-        <div className="skills-list">
-          {technologies.map((tech, index) => (
-            <span key={index} className="skill-item">{tech}</span>
+        <ul className="skills-list">
+          {technologies.map((tech) => (
+            <li key={tech} className="skill-item">
+              {tech}
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
 };
 
 export default Skills;
-
